@@ -548,9 +548,9 @@ class Paradetox(ParallelDataset):
 class IteraTeRV2(ParallelDataset):
     def __init__(self, task_type, prompts, **kwargs):
         self.type = task_type
-        super().__init__(**kwargs)
-        self.prompts = prompts
         self.pattern = r'<S>(.*?)</S>'
+        self.prompts = prompts
+        super().__init__(**kwargs)
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
