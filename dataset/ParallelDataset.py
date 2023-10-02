@@ -566,16 +566,17 @@ class IteraTeRV2(ParallelDataset):
             before_sentence = before_sentence[len(intent):]
             after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
             output = f'<extra_id_0> {output} <extra_id_1>'
+            before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
             for _ in range(self.repeat_with_different_prompts):
-                inputs.append(f'{random.sample(self.prompts, 1)}: {before_sentence} -> {after_sentence}')
+                inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
                 outputs.append(output)
 
-            return DatasetDict({'train': Dataset.from_dict({'input': inputs, 'output': outputs})})
+        return DatasetDict({'train': Dataset.from_dict({'input': inputs, 'output': outputs})})
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: x['labels'] == self.type)
         self.main_dataset = self.main_dataset.filter(
-            lambda x: len(x['before_sent'].split()) > 10 and len(x['after_sent'].split()) > 10 and len(
+            lambda x: len(x['before_sent_with_intent'].split()) > 10 and len(x['after_sent'].split()) > 10 and len(
                 re.findall(self.pattern, x['before_sent_with_intent'])) == 1)
 
     def push_to_hub(self):
