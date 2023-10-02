@@ -302,8 +302,8 @@ class GYAFC(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['formality_prompts']
-        self.generated_ds = self.generate_dataset()
         self.reverse_prompts = prompts['formality_rev_prompts']
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
