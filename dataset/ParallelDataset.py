@@ -206,7 +206,7 @@ class C4Gec(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
@@ -228,7 +228,7 @@ class FCE(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
@@ -253,7 +253,7 @@ class Lang8(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
