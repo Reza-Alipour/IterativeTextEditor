@@ -451,7 +451,7 @@ class Parabank(ParallelDataset):
 class WNC(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
-        self.prompts = prompts['paraphrasing_prompts']
+        self.prompts = prompts['neutralization_prompts']
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
