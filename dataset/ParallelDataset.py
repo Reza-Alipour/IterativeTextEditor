@@ -233,20 +233,20 @@ class FCE(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
         train_ds = datasets.concatenate_datasets([ds['train'], ds['validation'], ds['test']])
-        no_edit_ds = self.generate_no_edit_dataset('text', train_ds, 'fce_gec')
-        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['text'], x['edited_text']),
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'fce_gec')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'fce_gec', 'simple')
-        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['text'], x['edited_text']),
+        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'fce_gec', 'mask')
-        return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).remove_columns(
-            ['text', 'edited_text', 'still_need_edit']
-        ).shuffle()})
+        return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()})
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
             lambda x: x['still_need_edit'] == [] and len(x['text'].split()) < 300)
+        self.main_dataset = self.main_dataset.remove_columns(['still_need_edit'])
+        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
 
 class Lang8(ParallelDataset):
@@ -257,19 +257,18 @@ class Lang8(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
-        no_edit_ds = self.generate_no_edit_dataset('text', train_ds, 'lang8_gec')
-        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['text'], x['edited_text']),
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'lang8_gec')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'lang8_gec', 'simple')
-        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['text'], x['edited_text']),
+        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'lang8_gec', 'mask')
-        return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).remove_columns(
-            ['text', 'edited_text']
-        ).shuffle()})
+        return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()})
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: len(x['text'].split()) < 300)
+        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
 
 class BEA19(ParallelDataset):
@@ -281,22 +280,22 @@ class BEA19(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
         train_ds = datasets.concatenate_datasets([ds['train'], ds['validation']])
-        no_edit_ds = self.generate_no_edit_dataset('text', train_ds, 'bea19_gec')
-        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['text'], x['edited_text']),
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'bea19_gec')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'bea19_gec', 'simple')
-        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['text'], x['edited_text']),
+        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'bea19_gec', 'mask')
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).remove_columns(
-                ['text', 'edited_text', 'still_need_edit']
-            ).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
             lambda x: len(x['text'].split()) < 350 and x['still_need_edit'] == [])
+        self.main_dataset = self.main_dataset.remove_columns(['still_need_edit'])
+        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
 
 class GYAFC(ParallelDataset):
@@ -309,33 +308,32 @@ class GYAFC(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
         train_ds = datasets.concatenate_datasets([ds['train'], ds['validation'], ds['test']])
-        no_edit_ds = self.generate_no_edit_dataset('input_text', train_ds, 'gyafc_formal')
-        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input_text'], x['output_text']),
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'gyafc_formal')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'gyafc_formal', 'simple')
         mask_ds = train_ds.map(
-            lambda x: self.create_masked_pair(self.prompts, x['input_text'], x['output_text']),
+            lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
             batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'gyafc_formal', 'mask')
 
         simple_ds_rev = train_ds.map(
-            lambda x: self.create_simple_pair(self.reverse_prompts, x['output_text'], x['input_text']),
+            lambda x: self.create_simple_pair(self.reverse_prompts, x['output'], x['input']),
             batched=True)
         simple_ds_rev = self.add_type_to_dataset(simple_ds_rev, 'gyafc_informal', 'simple')
         mask_ds_rev = train_ds.map(
-            lambda x: self.create_masked_pair(self.reverse_prompts, x['output_text'], x['input_text']),
+            lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
             batched=True
         )
         mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'gyafc_informal', 'mask')
 
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, simple_ds_rev, mask_ds_rev, no_edit_ds]).remove_columns(
-                ['input_text', 'output_text']
-            ).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, simple_ds_rev, mask_ds_rev, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: len(x['input_text'].split()) > 8)
+        self.main_dataset = self.main_dataset.rename_columns({'input_text': 'input', 'output_text': 'output'})
 
 
 class DiscoFuse(ParallelDataset):
@@ -345,14 +343,7 @@ class DiscoFuse(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        ds = self.main_dataset.map(lambda example: {
-            'input': example['incoherent_first_sentence'] + ' ' + example['incoherent_second_sentence']
-        })
-        ds = ds.rename_column('coherent_first_sentence', 'output')
-        ds = ds.remove_columns(
-            ['connective_string', 'discourse_type', 'coherent_second_sentence', 'has_coref_type_pronoun',
-             'incoherent_first_sentence', 'incoherent_second_sentence', 'has_coref_type_nominal'])
-        train_ds = ds['train']
+        train_ds = self.main_dataset['train']
         ds_split = train_ds.train_test_split(train_size=0.95, seed=split_seed)
         train_ds = ds_split['train']
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'disco_fuse_coh')
@@ -370,6 +361,13 @@ class DiscoFuse(ParallelDataset):
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: len(x['incoherent_first_sentence'].split()) > 8 and len(
             x['incoherent_second_sentence'].split()) > 8)
+        self.main_dataset = self.main_dataset.map(lambda example: {
+            'input': example['incoherent_first_sentence'] + ' ' + example['incoherent_second_sentence']
+        })
+        self.main_dataset = self.main_dataset.rename_column('coherent_first_sentence', 'output')
+        self.main_dataset = self.main_dataset.remove_columns(
+            ['connective_string', 'discourse_type', 'coherent_second_sentence', 'has_coref_type_pronoun',
+             'incoherent_first_sentence', 'incoherent_second_sentence', 'has_coref_type_nominal'])
 
 
 class WikiAuto(ParallelDataset):
@@ -379,7 +377,7 @@ class WikiAuto(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = self.main_dataset['train'].rename_columns({'normal': 'input', 'simple': 'output'})
+        train_ds = self.main_dataset['train']
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'wiki_auto_simplicity')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
@@ -395,6 +393,7 @@ class WikiAuto(ParallelDataset):
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
             lambda x: 10 < len(x['normal'].split()) < 500 and 30 < len(x['simple'].split()) < 500)
+        self.main_dataset = self.main_dataset.rename_columns({'normal': 'input', 'simple': 'output'})
 
 
 class WikiLarge(ParallelDataset):
@@ -404,7 +403,7 @@ class WikiLarge(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = self.main_dataset['train'].rename_columns({'simple': 'output'})
+        train_ds = self.main_dataset['train']
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'wiki_large_simplicity')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
@@ -420,6 +419,7 @@ class WikiLarge(ParallelDataset):
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
             lambda x: 20 < len(x['input'].split()) < 100 and 15 < len(x['simple'].split()) < 50)
+        self.main_dataset = self.main_dataset.rename_columns({'simple': 'output'})
 
 
 class Parabank(ParallelDataset):
@@ -429,9 +429,8 @@ class Parabank(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = self.main_dataset['train'].rename_columns({'input_text': 'input', 'paraphrased_text': 'output'})
+        train_ds = self.main_dataset['train']
         train_ds = train_ds.train_test_split(train_size=0.95, seed=split_seed)['train']
-        train_ds = train_ds.remove_columns(['similarity'])
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'parabank_paraphrase')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
@@ -444,6 +443,10 @@ class Parabank(ParallelDataset):
             'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
+    def preprocess_dataset(self):
+        self.main_dataset = self.main_dataset.remove_columns(['similarity'])
+        self.main_dataset = self.main_dataset.rename_columns({'input_text': 'input', 'paraphrased_text': 'output'})
+
 
 class WNC(ParallelDataset):
     def __init__(self, prompts, **kwargs):
@@ -452,7 +455,7 @@ class WNC(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = self.main_dataset['train'].rename_columns({'text': 'input', 'edited_text': 'output'})
+        train_ds = self.main_dataset['train']
         train_ds = train_ds.train_test_split(train_size=0.95, seed=split_seed)['train']
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'wnc_neut')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
@@ -465,6 +468,9 @@ class WNC(ParallelDataset):
             'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
+    def preprocess_dataset(self):
+        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
+
 
 class APPDIA(ParallelDataset):
     def __init__(self, prompts, **kwargs):
@@ -474,8 +480,7 @@ class APPDIA(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = concatenate_datasets([self.main_dataset['train'], self.main_dataset['validation']]).rename_columns(
-            {'offensive-text': 'input', 'style-transferred-text': 'output'})
+        train_ds = concatenate_datasets([self.main_dataset['train'], self.main_dataset['validation']])
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'appdia_offensive')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
@@ -495,6 +500,10 @@ class APPDIA(ParallelDataset):
             'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
         })
 
+    def preprocess_dataset(self):
+        self.main_dataset = self.main_dataset.rename_columns(
+            {'offensive-text': 'input', 'style-transferred-text': 'output'})
+
 
 class Paradetox(ParallelDataset):
     def __init__(self, prompts, **kwargs):
@@ -504,7 +513,7 @@ class Paradetox(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        train_ds = self.main_dataset['train'].train_test_split(train_size=0.95)['train'].rename_column('toxic', 'input')
+        train_ds = self.main_dataset['train'].train_test_split(train_size=0.95)['train']
 
         ds1 = train_ds.remove_columns(['neutral2', 'neutral3']).rename_columns({'neutral1': 'output'}).filter(
             lambda x: x['output'] is not None)
@@ -534,6 +543,7 @@ class Paradetox(ParallelDataset):
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
             lambda x: len(x['toxic'].split()) > 6 and len(x['neutral1'].split()) > 6)
+        self.main_dataset = self.main_dataset.rename_column('toxic', 'input')
 
 
 class IteraTeRV2(ParallelDataset):
