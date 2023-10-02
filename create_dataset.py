@@ -31,9 +31,9 @@ def main(args):
     parallel_corpus_config = yaml.load(open(parallel_corpus_path, 'r'), Loader=yaml.FullLoader)
     read_token = parallel_corpus_config['read_token']
     write_token = parallel_corpus_config['write_token']
-    datasets = parallel_corpus_config['datasets']
-    for ds in datasets:
-        name = ds.keys()[0]
+    datasets_configs = parallel_corpus_config['datasets']
+    for ds in datasets_configs:
+        name = list(ds.keys())[0]
         if ds[name]['use'] is not True:
             continue
         ds_object: ParallelDataset = name_to_ds[name](
