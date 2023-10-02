@@ -276,7 +276,7 @@ class BEA19(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
@@ -303,7 +303,7 @@ class GYAFC(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['formality_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
         self.reverse_prompts = prompts['formality_rev_prompts']
 
     def generate_dataset(self) -> DatasetDict:
@@ -342,7 +342,7 @@ class DiscoFuse(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['coherence_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset.map(lambda example: {
@@ -376,7 +376,7 @@ class WikiAuto(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['simplification_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train'].rename_columns({'normal': 'input', 'simple': 'output'})
@@ -401,7 +401,7 @@ class WikiLarge(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['simplification_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train'].rename_columns({'simple': 'output'})
@@ -426,7 +426,7 @@ class Parabank(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['paraphrasing_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train'].rename_columns({'input_text': 'input', 'paraphrased_text': 'output'})
@@ -449,7 +449,7 @@ class WNC(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['paraphrasing_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train'].rename_columns({'text': 'input', 'edited_text': 'output'})
@@ -471,7 +471,7 @@ class APPDIA(ParallelDataset):
         super().__init__(**kwargs)
         self.prompts = prompts['offensive_prompts']
         self.reverse_prompts = prompts['offensive_rev_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = concatenate_datasets([self.main_dataset['train'], self.main_dataset['validation']]).rename_columns(
@@ -501,7 +501,7 @@ class Paradetox(ParallelDataset):
         super().__init__(**kwargs)
         self.prompts = prompts['toxic_prompts']
         self.reverse_prompts = prompts['toxic_rev_prompts']
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train'].train_test_split(train_size=0.95)['train'].rename_column('toxic', 'input')
@@ -542,7 +542,7 @@ class IteraTeRV2(ParallelDataset):
         self.prompts = prompts
         self.pattern = r'<S>(.*?)</S>'
         self.type = task_type
-        self.generated_dataset = self.generate_dataset()
+        self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
         intent = f'<{self.type}>'
