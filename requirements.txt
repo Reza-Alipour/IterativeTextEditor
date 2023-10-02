@@ -1,0 +1,9 @@
+torch==2.0.1
+transformers==4.33.2
+datasets==2.14.5
+sentencepiece==0.1.99
+accelerate==0.23.0
+trl==0.7.1
+tqdm==4.65.0
+protobuf
+evaluate==0.4.0
