@@ -578,6 +578,13 @@ class IteraTeRV2(ParallelDataset):
             lambda x: len(x['before_sent'].split()) > 10 and len(x['after_sent'].split()) > 10 and len(
                 re.findall(self.pattern, x['before_sent_with_intent'])) == 1)
 
+    def push_to_hub(self):
+        self.generated_ds.push_to_hub(
+            f'{self.ds_name}_{self.type}_aug',
+            private=True,
+            token=self.write_token
+        )
+
 
 class IteraTeRV2_Simplicity(IteraTeRV2):
     def __init__(self, prompts, **kwargs):
