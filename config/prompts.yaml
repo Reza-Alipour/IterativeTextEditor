@@ -1,0 +1,129 @@
+gec_prompts:
+  - Correct the following sentence for grammatical errors
+  - Identify and fix any grammatical mistakes in the given text
+  - Make the following sentence grammatically correct
+  - Proofread and edit the following passage for grammar
+  - Improve the grammar in the following text
+  - Fix errors
+  - Correct this
+  - Grammar check
+  - Edit for grammar
+  - Proofread
+coherence_prompts:
+  - Rewrite the following text to make it more coherent
+  - Improve the coherence of this passage
+  - Enhance the overall coherence of the following sentences
+  - Make the transition between these sentences more seamless
+  - Reorganize this paragraph to ensure better coherence
+  - Smooth out the flow of ideas in this text
+  - Create a more coherent narrative from these disjointed sentences
+  - Enhance coherence
+  - Improve flow
+  - Refine coherence
+simplification_prompts:
+  - Simplify the following text
+  - Make this text easier to understand
+  - Provide a simplified version of the following passage
+  - Clarify and simplify
+  - Convert complex language into simpler terms
+  - Create a simplified version of this content
+  - Simplify
+  - Clarify this
+  - Make it simpler
+  - Use plain language
+  - Simplify the following
+paraphrasing_prompts:
+  - Paraphrase the following sentence
+  - Provide an alternative wording for this text
+  - Rewrite the following passage using different words
+  - Offer a paraphrased version of this content
+  - Create a different phrasing for the following text
+  - Give me a reworded version of this sentence
+  - Change the wording of this paragraph
+  - Paraphrase
+  - Reword this
+  - Different phrasing
+  - Provide an alternative
+  - Change the wording
+neutralization_prompts:
+  - Neutralize the following text to make it more objective
+  - Remove bias and make this statement neutral
+  - Rewrite this passage to eliminate subjectivity
+  - Make this text less opinionated and more neutral
+  - Convert this content into a neutral and unbiased form
+  - Create a neutral version of this text
+  - Neutralize
+  - Make it objective
+  - Remove bias
+  - Create a neutral version
+offensive_prompts:
+  - Modify this text to make it less offensive
+  - Rephrase the following content to be more respectful
+  - Make the tone of this passage less offensive and more polite
+  - Remove offensive language and replace it with more appropriate words
+  - Make this statement less offensive and more constructive
+  - Less offensive
+  - Be more respectful
+  - Remove offensive language
+toxic_prompts:
+  - Revise this text to make it less toxic
+  - Eliminate harmful language and tone from the following content
+  - Make the tone of this passage less toxic and more constructive
+  - Remove toxic elements and replace them with more positive language
+  - Make this statement less toxic and more respectful
+  - Less toxic
+  - Be more positive
+  - Remove toxicity
+offensive_rev_prompts:
+  - Create a more aggressive tone in this content
+  - Generate offensive variations of this text
+  - Make this text more hostile and offensive
+  - Inject offensive language into this passage
+  - Generate offensive versions of this content
+  - Create a more offensive version of this text
+  - Make it offensive
+  - Add offensive language
+  - Create offensive variations
+toxic_rev_prompts:
+  - Introduce more toxic language into the following text
+  - Make this text more toxic
+  - Inject toxic elements into this passage
+  - Escalate the toxicity of this statement
+  - Make it more toxic
+  - Inject toxicity
+formality_prompts:
+  - Elevate the formality of the following text
+  - Make this content sound more formal
+  - Enhance the formal tone of this passage
+  - Transform this text into a more formal style
+  - Create a version of this content that is more dignified and formal
+  - Add a formal touch to this statement
+  - Increase the formality of this text
+  - Formalize
+  - Make it formal
+  - Enhance formality
+  - Create a formal version
+  - Add a formal touch
+formality_rev_prompts:
+  - Make this content sound more casual
+  - Tone down the formal tone of this passage
+  - Transform this text into a more casual style
+  - Add a casual touch to this statement
+  - Decrease the formality of this text
+  - Make it casual
+  - Lessen formality
+  - Create a casual version
+  - Add a casual touch
+do_not_edit_prompts:
+  - Copy the following text as is
+  - Do not make any changes, just replicate this text
+  - Exact copy
+  - Duplicate without alterations
+  - Preserve the original text
+  - Reproduce this text without editing
+  - Keep the text unchanged
+  - Copy
+  - Replicate
+  - No edits
+  - Duplicate
+  - Keep it as is
