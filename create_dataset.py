@@ -50,9 +50,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='Dataset Generator')
-    parser.add_argument('--prompts', type=str, default='config/prompts.yaml', help='Prompts file path')
-    parser.add_argument('--parallel_corpus', type=str, default='config/parallel_datasets.yaml',
+    parser.add_argument('--prompts', type=str,required=False, default='config/prompts.yaml', help='Prompts file path')
+    parser.add_argument('--parallel_corpus',required=False, type=str, default='config/parallel_datasets.yaml',
                         help='Parallel corpus file path')
-    parser.add_argument('--push_to_hub_every_corpus', type=bool, default=False, )
+    parser.add_argument('--push_to_hub_every_corpus', action='store_true', help='Push to hub every corpus')
     args = parser.parse_args(sys.argv[1:])
     main(args)
