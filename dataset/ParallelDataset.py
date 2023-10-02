@@ -232,8 +232,8 @@ class FCE(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
-        no_edit_ds = self.generate_no_edit_dataset('text', ds, 'fce_gec')
         train_ds = datasets.concatenate_datasets([ds['train'], ds['validation'], ds['test']])
+        no_edit_ds = self.generate_no_edit_dataset('text', train_ds, 'fce_gec')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['text'], x['edited_text']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'fce_gec', 'simple')
@@ -280,8 +280,8 @@ class BEA19(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         ds = self.main_dataset
-        no_edit_ds = self.generate_no_edit_dataset('text', ds, 'bea19_gec')
         train_ds = datasets.concatenate_datasets([ds['train'], ds['validation']])
+        no_edit_ds = self.generate_no_edit_dataset('text', train_ds, 'bea19_gec')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['text'], x['edited_text']),
                                  batched=True)
         simple_ds = self.add_type_to_dataset(simple_ds, 'bea19_gec', 'simple')
