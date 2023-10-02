@@ -558,14 +558,14 @@ class IteraTeRV2(ParallelDataset):
         train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
         return DatasetDict({'train': train_ds})
 
-    def generate_pairs(self, before_sentences: List[str], outputs: List[str]):
+    def generate_pairs(self, before_sentences: List[str], after_sentences: List[str]):
         intent = f'<{self.type}>'
 
         inputs: List[str] = []
         outputs: List[str] = []
         for i in range(len(before_sentences)):
             before_sentence = before_sentences[i]
-            output = outputs[i]
+            output = after_sentences[i]
             if not before_sentence.startswith(intent):
                 return {}
             before_sentence = before_sentence[len(intent):]
