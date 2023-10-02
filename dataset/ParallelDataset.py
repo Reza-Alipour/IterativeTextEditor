@@ -555,22 +555,26 @@ class IteraTeRV2(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
-        train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']))
+        train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
         return DatasetDict({'train': train_ds})
 
-    def generate_pairs(self, before_sentence, output):
+    def generate_pairs(self, before_sentences: List[str], outputs: List[str]):
         intent = f'<{self.type}>'
-        if not before_sentence.startswith(intent):
-            return {}
-        before_sentence = before_sentence[len(intent):]
-        after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
-        output = f'<extra_id_0> {output} <extra_id_1>'
-        inputs = []
-        outputs = []
-        before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
-        for _ in range(self.repeat_with_different_prompts):
-            inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
-            outputs.append(output)
+
+        inputs: List[str] = []
+        outputs: List[str] = []
+        for i in range(len(before_sentences)):
+            before_sentence = before_sentences[i]
+            output = outputs[i]
+            if not before_sentence.startswith(intent):
+                return {}
+            before_sentence = before_sentence[len(intent):]
+            after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
+            output = f'<extra_id_0> {output} <extra_id_1>'
+            before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
+            for _ in range(self.repeat_with_different_prompts):
+                inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
+                outputs.append(output)
         return {'input': inputs, 'output': outputs}
 
 
