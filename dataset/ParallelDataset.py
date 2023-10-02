@@ -554,30 +554,34 @@ class IteraTeRV2(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        intent = f'<{self.type}>'
         train_ds = self.main_dataset['train']
+        train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']))
+        return DatasetDict({'train': train_ds})
+
+    def generate_pairs(self, before_sentence, output):
+        intent = f'<{self.type}>'
+        if not before_sentence.startswith(intent):
+            return {}
+        before_sentence = before_sentence[len(intent):]
+        after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
+        output = f'<extra_id_0> {output} <extra_id_1>'
         inputs = []
         outputs = []
-        for i in range(len(train_ds)):
-            before_sentence = train_ds[i]['before_sent_with_intent']
-            output = train_ds[i]['after_sent']
-            if not before_sentence.startswith(intent):
-                continue
-            before_sentence = before_sentence[len(intent):]
-            after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
-            output = f'<extra_id_0> {output} <extra_id_1>'
-            before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
-            for _ in range(self.repeat_with_different_prompts):
-                inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
-                outputs.append(output)
+        before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
+        for _ in range(self.repeat_with_different_prompts):
+            inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
+            outputs.append(output)
+        return {'input': inputs, 'output': outputs}
 
-        return DatasetDict({'train': Dataset.from_dict({'input': inputs, 'output': outputs})})
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: x['labels'] == self.type)
         self.main_dataset = self.main_dataset.filter(
             lambda x: len(x['before_sent_with_intent'].split()) > 10 and len(x['after_sent'].split()) > 10 and len(
                 re.findall(self.pattern, x['before_sent_with_intent'])) == 1)
+        self.main_dataset = self.main_dataset.remove_columns(
+            ['before_sent', 'labels', 'confidence', 'doc_id', 'revision_depth'])
+        self.main_dataset = self.main_dataset.rename_columns({'before_sent_with_intent': 'input', 'after_sent': 'output'})
 
     def push_to_hub(self):
         self.generated_ds.push_to_hub(
