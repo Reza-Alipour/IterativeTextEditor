@@ -494,7 +494,6 @@ class APPDIA(ParallelDataset):
         mask_ds_rev = train_ds.map(lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
                                    batched=True)
         mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'appdia_offensive_rev', 'mask')
-        mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'appdia_offensive_rev', 'mask')
 
         return DatasetDict({
             'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
