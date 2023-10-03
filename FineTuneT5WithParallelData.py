@@ -145,7 +145,7 @@ def main():
         elif last_checkpoint is not None and training_args.resume_from_checkpoint is None:
             logger.info(f'Checkpoint detected, resuming training at {last_checkpoint}.')
     set_seed(training_args.seed)
-    dataset = load_dataset(args.dataset_name, token=args.dataset_read_token)
+    dataset = load_dataset(args.dataset_name, token=args.dataset_read_token, download_mode='force_redownload')
     config = AutoConfig.from_pretrained(
         pretrained_model_name_or_path=args.model_name,
         revision=args.model_revision,
