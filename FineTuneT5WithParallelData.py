@@ -37,8 +37,16 @@ import evaluate
 import numpy as np
 import transformers
 from datasets import load_dataset
-from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments, AutoConfig, AutoTokenizer, \
-    AutoModelForSeq2SeqLM, default_data_collator, HfArgumentParser
+from transformers import (
+    DataCollatorForSeq2Seq,
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
+    AutoConfig,
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    default_data_collator,
+    HfArgumentParser
+)
 from transformers.trainer_utils import get_last_checkpoint, set_seed
 
 logger = logging.getLogger(__name__)
