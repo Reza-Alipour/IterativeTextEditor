@@ -26,7 +26,7 @@ elif [ "$1" == "PA" ]; then
         --per_device_train_batch_size 32 \
         --per_device_eval_batch_size 32 \
         --output_dir output/ \
-        --deepspeed config/ds_config.json
+        --deepspeed configs/ds_config.json
 
 
 else
