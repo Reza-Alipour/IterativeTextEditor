@@ -223,8 +223,8 @@ def main():
         checkpoint = last_checkpoint
     trainer.train(resume_from_checkpoint=checkpoint)
     trainer.save_model()
-    tokenizer.push_to_hub(args.model_save_name, token=args.model_write_token)
-    model.push_to_hub(args.model_save_name, token=args.model_write_token)
+    tokenizer.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
+    model.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
 
 
 if __name__ == "__main__":
