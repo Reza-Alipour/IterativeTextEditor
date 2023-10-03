@@ -1,138 +1,120 @@
-read_token: ........
-write_token: .......
 datasets:
   - c4_gec:
       name: reza-alipour/c4_200m_0.1percent
-      need_token: true
       type: gec
       info: GEC Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: true
   - fce_gec:
       name: reza-alipour/fce
-      need_token: true
       type: gec
       info: GEC Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 2
       mask_sample_size: 5
       diff_mask: true
   - lang8:
       name: reza-alipour/lang8
-      need_token: true
       type: gec
       info: GEC Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: true
   - bea19:
       name: reza-alipour/bea19
-      need_token: true
       type: gec
       info: GEC Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 2
       mask_sample_size: 4
       diff_mask: true
   - gyafc:
       name: reza-alipour/gyafc_flatten
-      need_token: true
       type: formality
       info: Formality Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 4
       diff_mask: false
   - disco_fuse:
       name: reza-alipour/discofuse_1percent
-      need_token: true
       type: coherence
       info: Coherence Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 4
       diff_mask: false
   - wiki_auto:
       name: reza-alipour/WikiAuto
-      need_token: true
       type: simplification
       info: Simplification Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: false
   - wiki_large:
       name: reza-alipour/WikiLarge
-      need_token: true
       type: simplification
       info: Simplification Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 2
       diff_mask: false
   - para_bank_v2:
       name: reza-alipour/ParaBankV2
-      need_token: true
       type: paraphrase
       info: Paraphrasing Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: false
   - wnc:
       name: reza-alipour/WNC
-      need_token: true
       type: neutralization
       info: Neutralization Dataset
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: true
   - APPDIA_offensive:
       name: reza-alipour/APPDIA_offensive
-      need_token: true
       type: offensive
       info: Offensive Dataset ~ 2k
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 4
       diff_mask: true
   - Paradetox_toxic:
       name: reza-alipour/Paradetox_toxic
-      need_token: true
       type: toxic
       info: Toxic Dataset ~ 11k
-      use: true
+      use: false
       repeat_with_different_prompts: 1
       mask_sample_size: 4
       diff_mask: true
   - IteraTeR_Simplicity:
       name: reza-alipour/IteraTeR_v2_fixed
-      need_token: true
       type: simplification
       info: Simplicity
-      use: true
+      use: false
       repeat_with_different_prompts: 2
   - IteraTeR_Coherence:
       name: reza-alipour/IteraTeR_v2_fixed
-      need_token: true
       type: coherence
       info: Coherence
       use: true
       repeat_with_different_prompts: 2
   - IteraTeR_Fluency:
       name: reza-alipour/IteraTeR_v2_fixed
-      need_token: true
       type: gec
       info: GEC
       use: true
       repeat_with_different_prompts: 2
   - wiki_small:
       name: reza-alipour/WikiSmall
-      need_token: true
       type: simplification
       info: Simplification Dataset
       use: false
