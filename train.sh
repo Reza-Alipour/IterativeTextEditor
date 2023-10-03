@@ -18,15 +18,16 @@ elif [ "$1" == "PA" ]; then
         --eval_steps 2000 \
         --save_strategy epoch \
         --do_train \
-        --do_eval \
         --learning_rate 1e-4 \
-        --gradient_accumulation_steps 1 \
+        --gradient_accumulation_steps 12 \
         --overwrite_output_dir \
         --num_train_epochs 1 \
-        --per_device_train_batch_size 32 \
-        --per_device_eval_batch_size 32 \
+        --per_device_train_batch_size 8 \
+        --per_device_eval_batch_size 8 \
         --output_dir output/ \
-        --deepspeed configs/ds_config.json
+        --deepspeed configs/ds_config.json #\
+#        --predict_with_generate \
+#        --do_eval
 
 
 else
