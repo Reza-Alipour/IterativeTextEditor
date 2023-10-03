@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from typing import Callable
 
@@ -29,8 +30,8 @@ def main(args):
     parallel_corpus_path = args.parallel_corpus
     prompts = yaml.load(open(prompts_path, 'r'), Loader=yaml.FullLoader)
     parallel_corpus_config = yaml.load(open(parallel_corpus_path, 'r'), Loader=yaml.FullLoader)
-    read_token = parallel_corpus_config['read_token']
-    write_token = parallel_corpus_config['write_token']
+    read_token = os.getenv('HF_READ_TOKEN')
+    write_token = os.getenv('HF_WRITE_TOKEN')
     datasets_configs = parallel_corpus_config['datasets']
     for ds in datasets_configs:
         name = list(ds.keys())[0]
@@ -46,12 +47,10 @@ def main(args):
         ds_object.push_to_hub()
 
 
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='Dataset Generator')
-    parser.add_argument('--prompts', type=str,required=False, default='config/prompts.yaml', help='Prompts file path')
-    parser.add_argument('--parallel_corpus',required=False, type=str, default='config/parallel_datasets.yaml',
+    parser.add_argument('--prompts', type=str, required=False, default='configs/prompts.yaml', help='Prompts file path')
+    parser.add_argument('--parallel_corpus', required=False, type=str, default='configs/parallel_datasets.yaml',
                         help='Parallel corpus file path')
     parser.add_argument('--push_to_hub_every_corpus', action='store_true', help='Push to hub every corpus')
     args = parser.parse_args(sys.argv[1:])
