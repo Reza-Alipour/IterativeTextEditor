@@ -556,6 +556,7 @@ class IteraTeRV2(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
         train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
+        self.add_type_to_dataset(train_ds, 'IteraTeRV2', self.type)
         return DatasetDict({'train': train_ds})
 
     def generate_pairs(self, before_sentences: List[str], after_sentences: List[str]):
