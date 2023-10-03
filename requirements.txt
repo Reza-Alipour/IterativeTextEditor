@@ -7,3 +7,4 @@ trl==0.7.1
 tqdm==4.65.0
 protobuf
 evaluate==0.4.0
+deepspeed==0.10.3
