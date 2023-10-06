@@ -214,6 +214,11 @@ def main():
             pad_to_multiple_of=8 if training_args.fp16 else None,
         )
 
+    # Freezing encoder layers due to low resources
+    for param_name, layer in model.named_parameters():
+        if param_name.startwith('encoder'):
+            layer.requires_grad = False
+
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
