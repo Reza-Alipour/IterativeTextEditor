@@ -216,7 +216,7 @@ def main():
 
     # Freezing encoder layers due to low resources
     for param_name, layer in model.named_parameters():
-        if param_name.startwith('encoder'):
+        if param_name.startswith('encoder'):
             layer.requires_grad = False
 
     trainer = Seq2SeqTrainer(
