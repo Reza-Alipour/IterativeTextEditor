@@ -66,10 +66,12 @@ class CustomizedTrainArguments:
     max_target_length: int = field(default=512)
     preprocessing_num_workers: int = field(default=1)
     ignore_pad_token_for_loss: bool = field(default=True)
-    dataset_name: str = field(default='reza-alipour/Iterative_Style_Transformer_Dataset_shorter')
+    dataset_name: str = field(default='reza-alipour/Style_Transformer')
     dataset_read_token: str = field(default=None)
     should_log: bool = field(default=True)
     padding: bool = field(default=False)
+    training_size: int = field(default=200000)
+    training_start_from: int = field(default=0)
 
 
 def initialize_logger(should_log, training_args: Seq2SeqTrainingArguments, ):
@@ -144,6 +146,7 @@ def compute_metrics(eval_preds, tokenizer):
 def main():
     parser = HfArgumentParser((CustomizedTrainArguments, Seq2SeqTrainingArguments))
     args, training_args = parser.parse_args_into_dataclasses()
+    print(f'Ada Factor: {training_args.adafactor}')
     initialize_logger(args.should_log, training_args)
     last_checkpoint = None
     if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
@@ -175,8 +178,8 @@ def main():
         trust_remote_code=True
     )
 
-    train_dataset = dataset['train'].select(range(1000))
-    eval_dataset = dataset['validation'].select(range(1000))
+    train_dataset = dataset['train'].select(range(args.training_start_from, args.training_size))
+    # eval_dataset = dataset['validation'].select(range(1000))
 
     preprocessing_lambda = lambda x: dataset_preprocess_function(
         x,
@@ -194,14 +197,14 @@ def main():
             remove_columns=['input', 'output', 'from', 'type'],
             desc='Running tokenizer on train dataset'
         )
-    with training_args.main_process_first(desc="Validation dataset map pre-processing"):
-        eval_dataset = eval_dataset.map(
-            preprocessing_lambda,
-            batched=True,
-            num_proc=args.preprocessing_num_workers,
-            remove_columns=['input', 'output', 'from', 'type'],
-            desc='Running tokenizer on validation dataset'
-        )
+    # with training_args.main_process_first(desc="Validation dataset map pre-processing"):
+    #     eval_dataset = eval_dataset.map(
+    #         preprocessing_lambda,
+    #         batched=True,
+    #         num_proc=args.preprocessing_num_workers,
+    #         remove_columns=['input', 'output', 'from', 'type'],
+    #         desc='Running tokenizer on validation dataset'
+    #     )
 
     label_pad_token_id = -100 if args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     if args.padding:
@@ -223,7 +226,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        # eval_dataset=eval_dataset,
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=lambda x: compute_metrics(x, tokenizer)

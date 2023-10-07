@@ -12,7 +12,7 @@ elif [ "$1" == "PA" ]; then
         --model_write_token "$HF_WRITE_TOKEN" \
         --max_source_length 512 \
         --max_target_length 512 \
-        --fp16 \
+        --adafactor \
         --preprocessing_num_workers 4 \
         --dataset_read_token "$HF_READ_TOKEN" \
         --evaluation_strategy steps \
