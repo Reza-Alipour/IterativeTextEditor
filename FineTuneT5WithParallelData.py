@@ -72,6 +72,7 @@ class CustomizedTrainArguments:
     padding: bool = field(default=False)
     training_size: int = field(default=200000)
     training_start_from: int = field(default=0)
+    freeze_encoder: bool = field(default=False)
 
 
 def initialize_logger(should_log, training_args: Seq2SeqTrainingArguments, ):
@@ -146,7 +147,6 @@ def compute_metrics(eval_preds, tokenizer):
 def main():
     parser = HfArgumentParser((CustomizedTrainArguments, Seq2SeqTrainingArguments))
     args, training_args = parser.parse_args_into_dataclasses()
-    print(f'Ada Factor: {training_args.adafactor}')
     initialize_logger(args.should_log, training_args)
     last_checkpoint = None
     if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
@@ -218,9 +218,10 @@ def main():
         )
 
     # Freezing encoder layers due to low resources
-    for param_name, layer in model.named_parameters():
-        if param_name.startswith('encoder'):
-            layer.requires_grad = False
+    if args.freeze_encoder:
+        for param_name, layer in model.named_parameters():
+            if param_name.startswith('encoder'):
+                layer.requires_grad = False
 
     trainer = Seq2SeqTrainer(
         model=model,
