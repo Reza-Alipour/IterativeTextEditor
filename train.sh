@@ -39,7 +39,7 @@ elif [ "$1" == "PA-Ada" ]; then
     --model_write_token "$HF_WRITE_TOKEN" \
     --max_source_length 128 \
     --max_target_length 128 \
-    --adafactor \
+    --optim adafactor \
     --preprocessing_num_workers 4 \
     --dataset_read_token "$HF_READ_TOKEN" \
     --evaluation_strategy steps \
