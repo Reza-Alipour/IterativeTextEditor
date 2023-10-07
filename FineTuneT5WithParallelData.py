@@ -239,7 +239,7 @@ def main():
     elif last_checkpoint is not None:
         checkpoint = last_checkpoint
     trainer.train(resume_from_checkpoint=checkpoint)
-    trainer.save_model()
+    # trainer.save_model()
     tokenizer.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
     model.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
 
