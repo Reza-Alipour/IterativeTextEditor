@@ -178,7 +178,10 @@ def main():
         trust_remote_code=True
     )
 
-    train_dataset = dataset['train'].select(range(args.training_start_from, args.training_size))
+    train_dataset = dataset['train'].select(range(
+        args.training_start_from,
+        min(args.training_start_from + args.training_size, len(dataset['train']))
+    ))
     # eval_dataset = dataset['validation'].select(range(1000))
 
     preprocessing_lambda = lambda x: dataset_preprocess_function(
