@@ -646,16 +646,16 @@ class IteraTerV1(ParallelDataset):
         self.generated_ds.save_to_disk(f'datasets/{self.ds_name}_{self.type}_aug')
 
 
-class IteraTerV1_Simplicity():
+class IteraTerV1_Simplicity(IteraTerV1):
     def __init__(self, prompts, **kwargs):
         super().__init__(task_type='clarity', prompts=prompts['simplification_prompts'], **kwargs)
 
 
-class IteraTerV1_Coherent():
+class IteraTerV1_Coherent(IteraTerV1):
     def __init__(self, prompts, **kwargs):
         super().__init__(task_type='coherence', prompts=prompts['coherence_prompts'], **kwargs)
 
 
-class IteraTerV1_Fluency():
+class IteraTerV1_Fluency(IteraTerV1):
     def __init__(self, prompts, **kwargs):
         super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)
