@@ -394,7 +394,7 @@ class WikiAuto(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: 10 < len(x['normal'].split()) < 500 and 30 < len(x['simple'].split()) < 500)
+            lambda x: 10 < len(x['normal'].split()) < 400 and 10 < len(x['simple'].split()) < 400)
         self.main_dataset = self.main_dataset.rename_columns({'normal': 'input', 'simple': 'output'})
 
 
