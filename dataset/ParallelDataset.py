@@ -292,7 +292,7 @@ class BEA19(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: len(x['text'].split()) < 350 and x['still_need_edit'] == [])
+            lambda x: len(x['text'].split()) < 350 and len(x['still_need_edit']) < 2)
         self.main_dataset = self.main_dataset.remove_columns(['still_need_edit'])
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
