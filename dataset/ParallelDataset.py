@@ -420,7 +420,7 @@ class WikiLarge(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: 20 < len(x['input'].split()) < 100 and 15 < len(x['simple'].split()) < 50)
+            lambda x: 20 < len(x['input'].split()) < 100 and 15 < len(x['simple'].split()) < 100)
         self.main_dataset = self.main_dataset.rename_columns({'simple': 'output'})
 
 
