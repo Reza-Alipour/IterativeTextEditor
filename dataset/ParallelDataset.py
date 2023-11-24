@@ -249,7 +249,7 @@ class FCE(ParallelDataset):
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
 
-class Lang8(ParallelDataset):
+class CLang8(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
@@ -257,18 +257,17 @@ class Lang8(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
-        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'lang8_gec')
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'clang8_gec')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
-        simple_ds = self.add_type_to_dataset(simple_ds, 'lang8_gec', 'simple')
+        simple_ds = self.add_type_to_dataset(simple_ds, 'clang8_gec', 'simple')
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
-        mask_ds = self.add_type_to_dataset(mask_ds, 'lang8_gec', 'mask')
+        mask_ds = self.add_type_to_dataset(mask_ds, 'clang8_gec', 'mask')
         return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()})
 
     def preprocess_dataset(self):
-        self.main_dataset = self.main_dataset.filter(lambda x: len(x['text'].split()) < 300)
-        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
+        self.main_dataset = self.main_dataset.filter(lambda x: 12 < len(x['input'].split()) < 50)
 
 
 class BEA19(ParallelDataset):
