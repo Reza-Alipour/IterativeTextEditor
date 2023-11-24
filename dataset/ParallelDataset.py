@@ -162,7 +162,7 @@ class ParallelDataset:
                 if len(output_list) == 0:
                     break
                 masked_output = output_list.copy()
-                span_nums = random.randint(1, max(min(len(output_list) // 10, 10), 2))
+                span_nums = random.randint(1, max(min(len(output_list) // 10, 20), 2))
                 for i in range(span_nums):
                     span_length = random.randint(1, min(10, len(output_list)))
                     span_start = random.randint(0, len(output_list) - span_length)
@@ -548,7 +548,7 @@ class IteraTeRV2(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
         train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
-        self.add_type_to_dataset(train_ds, f'IteraTeRV2_{self.type}', 'mask')
+        train_ds = self.add_type_to_dataset(train_ds, f'IteraTeRV2_{self.type}', 'mask')
         return DatasetDict({'train': train_ds})
 
     def generate_pairs(self, before_sentences: List[str], after_sentences: List[str]):
