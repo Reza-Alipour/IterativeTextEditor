@@ -472,6 +472,9 @@ class WNC(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['train'], self.main_dataset['validation']])
+        })
 
 
 class APPDIA(ParallelDataset):
