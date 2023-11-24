@@ -481,7 +481,6 @@ class APPDIA(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['offensive_prompts']
-        self.reverse_prompts = prompts['offensive_rev_prompts']
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
@@ -493,15 +492,9 @@ class APPDIA(ParallelDataset):
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'appdia_offensive', 'mask')
-        simple_ds_rev = train_ds.map(lambda x: self.create_simple_pair(self.reverse_prompts, x['output'], x['input']),
-                                     batched=True)
-        simple_ds_rev = self.add_type_to_dataset(simple_ds_rev, 'appdia_offensive_rev', 'simple')
-        mask_ds_rev = train_ds.map(lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
-                                   batched=True)
-        mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'appdia_offensive_rev', 'mask')
 
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
@@ -513,7 +506,6 @@ class Paradetox(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['toxic_prompts']
-        self.reverse_prompts = prompts['toxic_rev_prompts']
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
@@ -533,15 +525,8 @@ class Paradetox(ParallelDataset):
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'paradetox_toxic', 'mask')
-        simple_ds_rev = train_ds.map(lambda x: self.create_simple_pair(self.reverse_prompts, x['output'], x['input']),
-                                     batched=True)
-        simple_ds_rev = self.add_type_to_dataset(simple_ds_rev, 'paradetox_toxic_rev', 'simple')
-        mask_ds_rev = train_ds.map(lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
-                                   batched=True)
-        mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'paradetox_toxic_rev', 'mask')
-
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
