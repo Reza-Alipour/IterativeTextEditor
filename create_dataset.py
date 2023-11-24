@@ -47,7 +47,10 @@ def main(args):
             do_not_edit_prompts=prompts['do_not_edit_prompts'],
             **ds[name]
         )
-        ds_object.push_to_hub()
+        if args.push_to_hub_every_corpus:
+            ds_object.push_to_hub()
+        if args.save_to_disk:
+            ds_object.save_to_disk()
 
 
 if __name__ == '__main__':
@@ -56,5 +59,6 @@ if __name__ == '__main__':
     parser.add_argument('--parallel_corpus', required=False, type=str, default='configs/parallel_datasets.yaml',
                         help='Parallel corpus file path')
     parser.add_argument('--push_to_hub_every_corpus', action='store_true', help='Push to hub every corpus')
+    parser.add_argument('--save_to_disk', action='store_true', help='Save to disk')
     args = parser.parse_args(sys.argv[1:])
     main(args)

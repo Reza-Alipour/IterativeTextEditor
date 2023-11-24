@@ -37,6 +37,9 @@ class ParallelDataset:
             token=self.write_token
         )
 
+    def save_to_disk(self):
+        self.generated_ds.save_to_disk(f'datasets/{self.ds_name}_aug')
+
     def get_dataset(self, max_train_size=None):
         if max_train_size is not None and 'train' in self.generated_ds.keys():
             self.generated_ds['train'] = self.generated_ds['train'].select(range(max_train_size))
@@ -586,6 +589,9 @@ class IteraTeRV2(ParallelDataset):
             token=self.write_token
         )
 
+    def save_to_disk(self):
+        self.generated_ds.save_to_disk(f'datasets/{self.ds_name}_{self.type}_aug')
+
 
 class IteraTeRV2_Simplicity(IteraTeRV2):
     def __init__(self, prompts, **kwargs):
@@ -636,6 +642,9 @@ class IteraTerV1(ParallelDataset):
             private=True,
             token=self.write_token
         )
+
+    def save_to_disk(self):
+        self.generated_ds.save_to_disk(f'datasets/{self.ds_name}_{self.type}_aug')
 
 
 class IteraTerV1_Simplicity():
