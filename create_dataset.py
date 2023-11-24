@@ -12,7 +12,7 @@ def main(args):
     name_to_ds: Dict[str, Callable] = {
         'c4_gec': C4Gec,
         'fce_gec': FCE,
-        'lang8': Lang8,
+        'lang8': CLang8,
         'bea19': BEA19,
         'gyafc': GYAFC,
         'disco_fuse': DiscoFuse,
