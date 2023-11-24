@@ -331,8 +331,11 @@ class GYAFC(ParallelDataset):
         })
 
     def preprocess_dataset(self):
-        self.main_dataset = self.main_dataset.filter(lambda x: len(x['input_text'].split()) > 8)
-        self.main_dataset = self.main_dataset.rename_columns({'input_text': 'input', 'output_text': 'output'})
+        self.main_dataset = self.main_dataset.rename_columns({'informal': 'input', 'formal': 'output'})
+        self.main_dataset = self.main_dataset.filter(lambda x: 7 < len(x['input'].split()) < 70)
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['ent_train'], self.main_dataset['family_train']])
+        })
 
 
 class DiscoFuse(ParallelDataset):
@@ -577,7 +580,6 @@ class IteraTeRV2(ParallelDataset):
                 outputs.append(output)
         return {'input': inputs, 'output': outputs}
 
-
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: x['labels'] == self.type)
         self.main_dataset = self.main_dataset.filter(
@@ -585,7 +587,8 @@ class IteraTeRV2(ParallelDataset):
                 re.findall(self.pattern, x['before_sent_with_intent'])) == 1)
         self.main_dataset = self.main_dataset.remove_columns(
             ['before_sent', 'labels', 'confidence', 'doc_id', 'revision_depth'])
-        self.main_dataset = self.main_dataset.rename_columns({'before_sent_with_intent': 'input', 'after_sent': 'output'})
+        self.main_dataset = self.main_dataset.rename_columns(
+            {'before_sent_with_intent': 'input', 'after_sent': 'output'})
 
     def push_to_hub(self):
         self.generated_ds.push_to_hub(
@@ -608,3 +611,15 @@ class IteraTeRV2_Coherent(IteraTeRV2):
 class IteraTeRV2_Fluency(IteraTeRV2):
     def __init__(self, prompts, **kwargs):
         super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)
+
+
+class IteraTerV1_Simplicity():
+    pass
+
+
+class IteraTerV1_Coherent():
+    pass
+
+
+class IteraTerV1_Fluency():
+    pass
