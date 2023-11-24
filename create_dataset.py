@@ -25,6 +25,9 @@ def main(args):
         'IteraTeR_Simplicity': IteraTeRV2_Simplicity,
         'IteraTeR_Coherence': IteraTeRV2_Coherent,
         'IteraTeR_Fluency': IteraTeRV2_Fluency,
+        'IteraTeR_V1_Coherence': IteraTerV1_Coherent,
+        'IteraTeR_V1_Simplicity': IteraTerV1_Simplicity,
+        'IteraTeR_V1_Fluency': IteraTerV1_Fluency
     }
     prompts_path = args.prompts
     parallel_corpus_path = args.parallel_corpus
