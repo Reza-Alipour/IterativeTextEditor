@@ -546,7 +546,7 @@ class IteraTeRV2(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
         train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
-        self.add_type_to_dataset(train_ds, 'IteraTeRV2', self.type)
+        self.add_type_to_dataset(train_ds, f'IteraTeRV2_{self.type}', 'mask')
         return DatasetDict({'train': train_ds})
 
     def generate_pairs(self, before_sentences: List[str], after_sentences: List[str]):
@@ -561,6 +561,7 @@ class IteraTeRV2(ParallelDataset):
                 return {}
             before_sentence = before_sentence[len(intent):]
             after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
+            after_sentence = after_sentence.replace('<S>', '').replace('</S>', '')
             output = f'<extra_id_0> {output} <extra_id_1>'
             before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
             for _ in range(self.repeat_with_different_prompts):
@@ -601,13 +602,52 @@ class IteraTeRV2_Fluency(IteraTeRV2):
         super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)
 
 
+class IteraTerV1(ParallelDataset):
+    def __init__(self, task_type, prompts, **kwargs):
+        self.type = task_type
+        self.prompts = prompts
+        super().__init__(**kwargs)
+        self.generated_ds = self.generate_dataset()
+
+    def generate_dataset(self) -> DatasetDict:
+        train_ds = self.main_dataset['train']
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, f'IteraTerV1_{self.type}')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
+                                 batched=True)
+        simple_ds = self.add_type_to_dataset(simple_ds, f'IteraTerV1_{self.type}', 'simple')
+        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
+                               batched=True)
+        mask_ds = self.add_type_to_dataset(mask_ds, f'IteraTerV1_{self.type}', 'mask')
+
+        return DatasetDict({
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
+        })
+
+    def preprocess_dataset(self):
+        self.main_dataset = self.main_dataset.filter(lambda x: x['task'] == self.type).remove_columns('task')
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['train'], self.main_dataset['human_validation'],
+                                           self.main_dataset['full_validation']])
+        })
+
+    def push_to_hub(self):
+        self.generated_ds.push_to_hub(
+            f'{self.ds_name}_{self.type}_aug',
+            private=True,
+            token=self.write_token
+        )
+
+
 class IteraTerV1_Simplicity():
-    pass
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='clarity', prompts=prompts['simplification_prompts'], **kwargs)
 
 
 class IteraTerV1_Coherent():
-    pass
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='coherence', prompts=prompts['coherence_prompts'], **kwargs)
 
 
 class IteraTerV1_Fluency():
-    pass
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)
