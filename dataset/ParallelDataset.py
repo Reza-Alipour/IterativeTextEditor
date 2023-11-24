@@ -308,8 +308,7 @@ class GYAFC(ParallelDataset):
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
-        ds = self.main_dataset
-        train_ds = datasets.concatenate_datasets([ds['train'], ds['validation'], ds['test']])
+        train_ds = self.main_dataset['train']
         no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'gyafc_formal')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
