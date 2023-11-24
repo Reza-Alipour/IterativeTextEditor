@@ -66,10 +66,13 @@ class CustomizedTrainArguments:
     max_target_length: int = field(default=512)
     preprocessing_num_workers: int = field(default=1)
     ignore_pad_token_for_loss: bool = field(default=True)
-    dataset_name: str = field(default='reza-alipour/Iterative_Style_Transformer_Dataset_shorter')
+    dataset_name: str = field(default='reza-alipour/Style_Transformer')
     dataset_read_token: str = field(default=None)
     should_log: bool = field(default=True)
     padding: bool = field(default=False)
+    training_size: int = field(default=200000)
+    training_start_from: int = field(default=0)
+    freeze_encoder: bool = field(default=False)
 
 
 def initialize_logger(should_log, training_args: Seq2SeqTrainingArguments, ):
@@ -175,8 +178,11 @@ def main():
         trust_remote_code=True
     )
 
-    train_dataset = dataset['train']
-    eval_dataset = dataset['validation']
+    train_dataset = dataset['train'].select(range(
+        args.training_start_from,
+        min(args.training_start_from + args.training_size, len(dataset['train']))
+    ))
+    # eval_dataset = dataset['validation'].select(range(1000))
 
     preprocessing_lambda = lambda x: dataset_preprocess_function(
         x,
@@ -194,14 +200,14 @@ def main():
             remove_columns=['input', 'output', 'from', 'type'],
             desc='Running tokenizer on train dataset'
         )
-    with training_args.main_process_first(desc="Validation dataset map pre-processing"):
-        eval_dataset = eval_dataset.map(
-            preprocessing_lambda,
-            batched=True,
-            num_proc=args.preprocessing_num_workers,
-            remove_columns=['input', 'output', 'from', 'type'],
-            desc='Running tokenizer on validation dataset'
-        )
+    # with training_args.main_process_first(desc="Validation dataset map pre-processing"):
+    #     eval_dataset = eval_dataset.map(
+    #         preprocessing_lambda,
+    #         batched=True,
+    #         num_proc=args.preprocessing_num_workers,
+    #         remove_columns=['input', 'output', 'from', 'type'],
+    #         desc='Running tokenizer on validation dataset'
+    #     )
 
     label_pad_token_id = -100 if args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     if args.padding:
@@ -215,15 +221,16 @@ def main():
         )
 
     # Freezing encoder layers due to low resources
-    for param_name, layer in model.named_parameters():
-        if param_name.startswith('encoder'):
-            layer.requires_grad = False
+    if args.freeze_encoder:
+        for param_name, layer in model.named_parameters():
+            if param_name.startswith('encoder'):
+                layer.requires_grad = False
 
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        # eval_dataset=eval_dataset,
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=lambda x: compute_metrics(x, tokenizer)
@@ -235,7 +242,7 @@ def main():
     elif last_checkpoint is not None:
         checkpoint = last_checkpoint
     trainer.train(resume_from_checkpoint=checkpoint)
-    trainer.save_model()
+    # trainer.save_model()
     tokenizer.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
     model.push_to_hub(args.model_save_name, private=True, token=args.model_write_token)
 

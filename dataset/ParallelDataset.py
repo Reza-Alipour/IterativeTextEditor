@@ -5,9 +5,9 @@ from random import sample
 from typing import List, Dict
 
 import datasets
-from datasets import load_dataset, DatasetDict, concatenate_datasets, Dataset
+from datasets import load_dataset, DatasetDict, concatenate_datasets
 
-split_seed = 443
+split_seed = 1337
 
 
 class ParallelDataset:
@@ -249,7 +249,7 @@ class FCE(ParallelDataset):
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
 
-class Lang8(ParallelDataset):
+class CLang8(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['gec_prompts']
@@ -257,18 +257,17 @@ class Lang8(ParallelDataset):
 
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
-        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'lang8_gec')
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, 'clang8_gec')
         simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
                                  batched=True)
-        simple_ds = self.add_type_to_dataset(simple_ds, 'lang8_gec', 'simple')
+        simple_ds = self.add_type_to_dataset(simple_ds, 'clang8_gec', 'simple')
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
-        mask_ds = self.add_type_to_dataset(mask_ds, 'lang8_gec', 'mask')
+        mask_ds = self.add_type_to_dataset(mask_ds, 'clang8_gec', 'mask')
         return DatasetDict({'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()})
 
     def preprocess_dataset(self):
-        self.main_dataset = self.main_dataset.filter(lambda x: len(x['text'].split()) < 300)
-        self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
+        self.main_dataset = self.main_dataset.filter(lambda x: 12 < len(x['input'].split()) < 50)
 
 
 class BEA19(ParallelDataset):
@@ -293,7 +292,7 @@ class BEA19(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: len(x['text'].split()) < 350 and x['still_need_edit'] == [])
+            lambda x: len(x['text'].split()) < 350 and len(x['still_need_edit']) < 2)
         self.main_dataset = self.main_dataset.remove_columns(['still_need_edit'])
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
 
@@ -332,8 +331,11 @@ class GYAFC(ParallelDataset):
         })
 
     def preprocess_dataset(self):
-        self.main_dataset = self.main_dataset.filter(lambda x: len(x['input_text'].split()) > 8)
-        self.main_dataset = self.main_dataset.rename_columns({'input_text': 'input', 'output_text': 'output'})
+        self.main_dataset = self.main_dataset.rename_columns({'informal': 'input', 'formal': 'output'})
+        self.main_dataset = self.main_dataset.filter(lambda x: 7 < len(x['input'].split()) < 70)
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['ent_train'], self.main_dataset['family_train']])
+        })
 
 
 class DiscoFuse(ParallelDataset):
@@ -392,7 +394,7 @@ class WikiAuto(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: 10 < len(x['normal'].split()) < 500 and 30 < len(x['simple'].split()) < 500)
+            lambda x: 10 < len(x['normal'].split()) < 400 and 10 < len(x['simple'].split()) < 400)
         self.main_dataset = self.main_dataset.rename_columns({'normal': 'input', 'simple': 'output'})
 
 
@@ -418,7 +420,7 @@ class WikiLarge(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(
-            lambda x: 20 < len(x['input'].split()) < 100 and 15 < len(x['simple'].split()) < 50)
+            lambda x: 20 < len(x['input'].split()) < 100 and 15 < len(x['simple'].split()) < 100)
         self.main_dataset = self.main_dataset.rename_columns({'simple': 'output'})
 
 
@@ -470,13 +472,15 @@ class WNC(ParallelDataset):
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.rename_columns({'text': 'input', 'edited_text': 'output'})
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['train'], self.main_dataset['validation']])
+        })
 
 
 class APPDIA(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['offensive_prompts']
-        self.reverse_prompts = prompts['offensive_rev_prompts']
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
@@ -488,15 +492,9 @@ class APPDIA(ParallelDataset):
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'appdia_offensive', 'mask')
-        simple_ds_rev = train_ds.map(lambda x: self.create_simple_pair(self.reverse_prompts, x['output'], x['input']),
-                                     batched=True)
-        simple_ds_rev = self.add_type_to_dataset(simple_ds_rev, 'appdia_offensive_rev', 'simple')
-        mask_ds_rev = train_ds.map(lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
-                                   batched=True)
-        mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'appdia_offensive_rev', 'mask')
 
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
@@ -508,7 +506,6 @@ class Paradetox(ParallelDataset):
     def __init__(self, prompts, **kwargs):
         super().__init__(**kwargs)
         self.prompts = prompts['toxic_prompts']
-        self.reverse_prompts = prompts['toxic_rev_prompts']
         self.generated_ds = self.generate_dataset()
 
     def generate_dataset(self) -> DatasetDict:
@@ -528,15 +525,8 @@ class Paradetox(ParallelDataset):
         mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
                                batched=True)
         mask_ds = self.add_type_to_dataset(mask_ds, 'paradetox_toxic', 'mask')
-        simple_ds_rev = train_ds.map(lambda x: self.create_simple_pair(self.reverse_prompts, x['output'], x['input']),
-                                     batched=True)
-        simple_ds_rev = self.add_type_to_dataset(simple_ds_rev, 'paradetox_toxic_rev', 'simple')
-        mask_ds_rev = train_ds.map(lambda x: self.create_masked_pair(self.reverse_prompts, x['output'], x['input']),
-                                   batched=True)
-        mask_ds_rev = self.add_type_to_dataset(mask_ds_rev, 'paradetox_toxic_rev', 'mask')
-
         return DatasetDict({
-            'train': concatenate_datasets([simple_ds, mask_ds, mask_ds_rev, simple_ds_rev, no_edit_ds]).shuffle()
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
         })
 
     def preprocess_dataset(self):
@@ -556,7 +546,7 @@ class IteraTeRV2(ParallelDataset):
     def generate_dataset(self) -> DatasetDict:
         train_ds = self.main_dataset['train']
         train_ds = train_ds.map(lambda x: self.generate_pairs(x['input'], x['output']), batched=True)
-        self.add_type_to_dataset(train_ds, 'IteraTeRV2', self.type)
+        self.add_type_to_dataset(train_ds, f'IteraTeRV2_{self.type}', 'mask')
         return DatasetDict({'train': train_ds})
 
     def generate_pairs(self, before_sentences: List[str], after_sentences: List[str]):
@@ -571,13 +561,13 @@ class IteraTeRV2(ParallelDataset):
                 return {}
             before_sentence = before_sentence[len(intent):]
             after_sentence = re.sub(self.pattern, '<extra_id_0>', before_sentence)
+            after_sentence = after_sentence.replace('<S>', '').replace('</S>', '')
             output = f'<extra_id_0> {output} <extra_id_1>'
             before_sentence = before_sentence.replace('<S>', '').replace('</S>', '')
             for _ in range(self.repeat_with_different_prompts):
                 inputs.append(f'{random.sample(self.prompts, 1)[0]}: {before_sentence} -> {after_sentence}')
                 outputs.append(output)
         return {'input': inputs, 'output': outputs}
-
 
     def preprocess_dataset(self):
         self.main_dataset = self.main_dataset.filter(lambda x: x['labels'] == self.type)
@@ -586,7 +576,8 @@ class IteraTeRV2(ParallelDataset):
                 re.findall(self.pattern, x['before_sent_with_intent'])) == 1)
         self.main_dataset = self.main_dataset.remove_columns(
             ['before_sent', 'labels', 'confidence', 'doc_id', 'revision_depth'])
-        self.main_dataset = self.main_dataset.rename_columns({'before_sent_with_intent': 'input', 'after_sent': 'output'})
+        self.main_dataset = self.main_dataset.rename_columns(
+            {'before_sent_with_intent': 'input', 'after_sent': 'output'})
 
     def push_to_hub(self):
         self.generated_ds.push_to_hub(
@@ -607,5 +598,56 @@ class IteraTeRV2_Coherent(IteraTeRV2):
 
 
 class IteraTeRV2_Fluency(IteraTeRV2):
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)
+
+
+class IteraTerV1(ParallelDataset):
+    def __init__(self, task_type, prompts, **kwargs):
+        self.type = task_type
+        self.prompts = prompts
+        super().__init__(**kwargs)
+        self.generated_ds = self.generate_dataset()
+
+    def generate_dataset(self) -> DatasetDict:
+        train_ds = self.main_dataset['train']
+        no_edit_ds = self.generate_no_edit_dataset('input', train_ds, f'IteraTerV1_{self.type}')
+        simple_ds = train_ds.map(lambda x: self.create_simple_pair(self.prompts, x['input'], x['output']),
+                                 batched=True)
+        simple_ds = self.add_type_to_dataset(simple_ds, f'IteraTerV1_{self.type}', 'simple')
+        mask_ds = train_ds.map(lambda x: self.create_masked_pair(self.prompts, x['input'], x['output']),
+                               batched=True)
+        mask_ds = self.add_type_to_dataset(mask_ds, f'IteraTerV1_{self.type}', 'mask')
+
+        return DatasetDict({
+            'train': concatenate_datasets([simple_ds, mask_ds, no_edit_ds]).shuffle()
+        })
+
+    def preprocess_dataset(self):
+        self.main_dataset = self.main_dataset.filter(lambda x: x['task'] == self.type).remove_columns('task')
+        self.main_dataset = DatasetDict({
+            'train': concatenate_datasets([self.main_dataset['train'], self.main_dataset['human_validation'],
+                                           self.main_dataset['full_validation']])
+        })
+
+    def push_to_hub(self):
+        self.generated_ds.push_to_hub(
+            f'{self.ds_name}_{self.type}_aug',
+            private=True,
+            token=self.write_token
+        )
+
+
+class IteraTerV1_Simplicity():
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='clarity', prompts=prompts['simplification_prompts'], **kwargs)
+
+
+class IteraTerV1_Coherent():
+    def __init__(self, prompts, **kwargs):
+        super().__init__(task_type='coherence', prompts=prompts['coherence_prompts'], **kwargs)
+
+
+class IteraTerV1_Fluency():
     def __init__(self, prompts, **kwargs):
         super().__init__(task_type='fluency', prompts=prompts['gec_prompts'], **kwargs)

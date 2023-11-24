@@ -3,47 +3,47 @@ datasets:
       name: reza-alipour/c4_200m_0.1percent
       type: gec
       info: GEC Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 3
+      mask_sample_size: 2
       diff_mask: true
   - fce_gec:
       name: reza-alipour/fce
       type: gec
       info: GEC Dataset
-      use: false
-      repeat_with_different_prompts: 2
-      mask_sample_size: 5
+      use: true
+      repeat_with_different_prompts: 3
+      mask_sample_size: 10
       diff_mask: true
   - lang8:
-      name: reza-alipour/lang8
+      name: reza-alipour/clang8
       type: gec
       info: GEC Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 3
+      mask_sample_size: 1
       diff_mask: true
   - bea19:
       name: reza-alipour/bea19
       type: gec
       info: GEC Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 2
-      mask_sample_size: 4
+      mask_sample_size: 10
       diff_mask: true
   - gyafc:
-      name: reza-alipour/gyafc_flatten
+      name: reza-alipour/GYAFC-Train
       type: formality
       info: Formality Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 4
+      mask_sample_size: 5
       diff_mask: false
   - disco_fuse:
       name: reza-alipour/discofuse_1percent
       type: coherence
       info: Coherence Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
       mask_sample_size: 4
       diff_mask: false
@@ -51,7 +51,7 @@ datasets:
       name: reza-alipour/WikiAuto
       type: simplification
       info: Simplification Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
       mask_sample_size: 3
       diff_mask: false
@@ -59,7 +59,7 @@ datasets:
       name: reza-alipour/WikiLarge
       type: simplification
       info: Simplification Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
       mask_sample_size: 2
       diff_mask: false
@@ -67,54 +67,67 @@ datasets:
       name: reza-alipour/ParaBankV2
       type: paraphrase
       info: Paraphrasing Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 3
+      mask_sample_size: 5
       diff_mask: false
   - wnc:
       name: reza-alipour/WNC
       type: neutralization
       info: Neutralization Dataset
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 3
+      mask_sample_size: 5
       diff_mask: true
   - APPDIA_offensive:
       name: reza-alipour/APPDIA_offensive
       type: offensive
       info: Offensive Dataset ~ 2k
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 4
+      mask_sample_size: 5
       diff_mask: true
   - Paradetox_toxic:
       name: reza-alipour/Paradetox_toxic
       type: toxic
       info: Toxic Dataset ~ 11k
-      use: false
+      use: true
       repeat_with_different_prompts: 1
-      mask_sample_size: 4
+      mask_sample_size: 3
       diff_mask: true
   - IteraTeR_Simplicity:
       name: reza-alipour/IteraTeR_v2_fixed
       type: simplification
       info: Simplicity
-      use: false
-      repeat_with_different_prompts: 2
+      use: true
+      repeat_with_different_prompts: 3
   - IteraTeR_Coherence:
       name: reza-alipour/IteraTeR_v2_fixed
       type: coherence
       info: Coherence
       use: true
-      repeat_with_different_prompts: 2
+      repeat_with_different_prompts: 4
   - IteraTeR_Fluency:
       name: reza-alipour/IteraTeR_v2_fixed
       type: gec
       info: GEC
       use: true
-      repeat_with_different_prompts: 2
-  - wiki_small:
-      name: reza-alipour/WikiSmall
+      repeat_with_different_prompts: 3
+  - IteraTeR_V1_Simplicity:
+      name: reza-alipour/IteraTer1
       type: simplification
-      info: Simplification Dataset
-      use: false
+      info: Simplicity
+      use: true
+      repeat_with_different_prompts: 3
+  - IteraTeR_V1_Coherence:
+      name: reza-alipour/IteraTer1
+      type: coherence
+      info: Coherence
+      use: true
+      repeat_with_different_prompts: 4
+  - IteraTeR_V1_Fluency:
+      name: reza-alipour/IteraTer1
+      type: gec
+      info: GEC
+      use: true
+      repeat_with_different_prompts: 3
