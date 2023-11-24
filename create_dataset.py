@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 from typing import Callable
 
 import yaml
@@ -60,5 +59,5 @@ if __name__ == '__main__':
                         help='Parallel corpus file path')
     parser.add_argument('--push_to_hub_every_corpus', action='store_true', help='Push to hub every corpus')
     parser.add_argument('--save_to_disk', action='store_true', help='Save to disk')
-    args = parser.parse_args(sys.argv[1:])
+    args = parser.parse_args()
     main(args)
