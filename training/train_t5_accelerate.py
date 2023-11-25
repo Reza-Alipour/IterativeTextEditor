@@ -414,7 +414,7 @@ def main():
             raw_datasets = DatasetDict({
                 'train': raw_datasets['train'].select(range(
                     args.ds_select_from,
-                    max(args.ds_select_to, len(raw_datasets['train'])))
+                    min(args.ds_select_to, len(raw_datasets['train'])))
                 ),
                 'validation': raw_datasets['test']
             })
