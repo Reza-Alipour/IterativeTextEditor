@@ -416,7 +416,7 @@ def main():
                     args.ds_select_from,
                     max(args.ds_select_to, len(raw_datasets['train'])))
                 ),
-                'validation': raw_datasets['validation']
+                'validation': raw_datasets['test']
             })
     else:
         data_files = {}
