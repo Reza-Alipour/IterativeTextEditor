@@ -1,3 +1,10 @@
+##################################################################################################################
+#####                                                                                                        #####
+#####  This file is an adaptation of the `run_translation.py` script from the huggingface/transformers repo   #####
+#####  Reza Alipour                                                                                          #####
+#####                                                                                                        #####
+##################################################################################################################
+
 #!/usr/bin/env python
 # coding=utf-8
 # Copyright The HuggingFace Team and The HuggingFace Inc. team. All rights reserved.
@@ -19,12 +26,6 @@ Fine-tuning the library models for sequence to sequence.
 # You can also adapt this script on your own sequence to sequence task. Pointers for this are left as comments.
 
 
-####################################################################################################################
-#####                                                                                                          #####
-#####    This file is an adaptation of the `run_translation.py` script from the huggingface/transformers repo   #####
-#####    Reza Alipour                                                                                          #####
-#####                                                                                                          #####
-####################################################################################################################
 
 import logging
 import os
