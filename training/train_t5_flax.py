@@ -6,7 +6,7 @@
 ######################################################################################################################
 
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 # coding=utf-8
 # Copyright 2021 The HuggingFace Team All rights reserved.
 #
@@ -46,7 +46,8 @@ import jax.numpy as jnp
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
 import optax
-from datasets import Dataset, load_dataset
+import transformers
+from datasets import Dataset, load_dataset, DatasetDict
 from filelock import FileLock
 from flax import jax_utils, traverse_util
 from flax.jax_utils import pad_shard_unpad, unreplicate
@@ -54,8 +55,6 @@ from flax.training import train_state
 from flax.training.common_utils import get_metrics, onehot, shard, shard_prng_key
 from huggingface_hub import Repository, create_repo
 from tqdm import tqdm
-
-import transformers
 from transformers import (
     CONFIG_MAPPING,
     FLAX_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING,
@@ -66,7 +65,6 @@ from transformers import (
     is_tensorboard_available,
 )
 from transformers.utils import is_offline_mode, send_example_telemetry
-
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +77,6 @@ except (LookupError, OSError):
         )
     with FileLock(".lock") as lock:
         nltk.download("punkt", quiet=True)
-
 
 MODEL_CONFIG_CLASSES = list(FLAX_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
@@ -331,13 +328,15 @@ class DataTrainingArguments:
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
+    ds_select_from: int = field(default=None)
+    ds_select_to: int = field(default=None)
 
     def __post_init__(self):
         if (
-            self.dataset_name is None
-            and self.train_file is None
-            and self.validation_file is None
-            and self.test_file is None
+                self.dataset_name is None
+                and self.train_file is None
+                and self.validation_file is None
+                and self.test_file is None
         ):
             raise ValueError("Need either a dataset name or a training, validation, or test file.")
         else:
@@ -416,7 +415,7 @@ def write_metric(summary_writer, train_metrics, eval_metrics, train_time, step):
 
 
 def create_learning_rate_fn(
-    train_ds_size: int, train_batch_size: int, num_train_epochs: int, num_warmup_steps: int, learning_rate: float
+        train_ds_size: int, train_batch_size: int, num_train_epochs: int, num_warmup_steps: int, learning_rate: float
 ) -> Callable[[int], jnp.ndarray]:
     """Returns a linear warmup, linear_decay learning rate function."""
     steps_per_epoch = train_ds_size // train_batch_size
@@ -456,10 +455,10 @@ def main():
     send_example_telemetry("run_summarization", model_args, data_args, framework="flax")
 
     if (
-        os.path.exists(training_args.output_dir)
-        and os.listdir(training_args.output_dir)
-        and training_args.do_train
-        and not training_args.overwrite_output_dir
+            os.path.exists(training_args.output_dir)
+            and os.listdir(training_args.output_dir)
+            and training_args.do_train
+            and not training_args.overwrite_output_dir
     ):
         raise ValueError(
             f"Output directory ({training_args.output_dir}) already exists and is not empty. "
@@ -511,6 +510,12 @@ def main():
             keep_in_memory=False,
             token=model_args.token,
         )
+        if data_args.ds_select_from is not None and data_args.ds_select_to is not None:
+            dataset = DatasetDict({
+                'train': dataset['train'].select(range(data_args.ds_select_from, data_args.ds_select_to)),
+                'validation': dataset['validation']
+            })
+
     else:
         data_files = {}
         if data_args.train_file is not None:
@@ -822,7 +827,7 @@ def main():
         confidence = 1.0 - label_smoothing_factor
         low_confidence = (1.0 - confidence) / (vocab_size - 1)
         normalizing_constant = -(
-            confidence * jnp.log(confidence) + (vocab_size - 1) * low_confidence * jnp.log(low_confidence + 1e-20)
+                confidence * jnp.log(confidence) + (vocab_size - 1) * low_confidence * jnp.log(low_confidence + 1e-20)
         )
         soft_labels = onehot(labels, vocab_size, on_value=confidence, off_value=low_confidence)
 
