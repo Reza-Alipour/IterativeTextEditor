@@ -1,13 +1,19 @@
-torch==2.1.0
-transformers==4.33.3
-datasets==2.14.5
+torch==2.1.1
+transformers==4.35.2
+datasets==2.15.0
 sentencepiece==0.1.99
-accelerate==0.23.0
-trl==0.7.1
+accelerate==0.24.1
+trl==0.7.4
 tqdm==4.66.1
-protobuf
-evaluate==0.4.0
-deepspeed==0.10.3
-numpy==1.22.4
+protobuf==4.25.1
+evaluate==0.4.1
+# deepspeed==0.10.3
+numpy==1.26.2
 sacrebleu >= 1.4.12
 py7zr
+jax>=0.2.8
+jaxlib>=0.1.59
+flax>=0.3.5
+optax>=0.0.8
+rouge-score
+nltk
